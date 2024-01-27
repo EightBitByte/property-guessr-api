@@ -11,14 +11,12 @@ import random
 
 def lat_lon_freeform() -> (float, float, str):
     addy = random_address.real_random_address_by_state("CA")
-    print(addy)
     address1 = addy['address1'] + ","
     city = addy['city'] + ", CA,"
     postal = addy['postalCode']
-    print(addy['coordinates']['lat'])
     freeform = "{in1} {in2} {in3}".format(in1=address1, in2=city, in3=postal)
-    print('String Concatenation using format() =', freeform)
-    print(addy['coordinates']['lat'], addy['coordinates']['lng'], freeform)
+    #print('String Concatenation using format() =', freeform)
+    #print(addy['coordinates']['lat'], addy['coordinates']['lng'], freeform)
     return (addy['coordinates']['lat'], addy['coordinates']['lng'], freeform)    
 #lat/lon ??
 def main():
