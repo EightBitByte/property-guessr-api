@@ -4,14 +4,20 @@ import urllib.request
 from collections import namedtuple
 
 LICENSE_KEY = "Py2dUqCOzoUdp00kL51hjZ**nSAcwXpxhQ0PC2lXxuDAZ-**"
-BASE_LOOKUP_PROPERTY_URL = "https://property.melissadata.net/v4/WEB/LookupProperty"
+LOOKUP_PROPERTY_BASE_URL = "https://property.melissadata.net/v4/WEB/LookupProperty"
 
 class MelissaAPI:
+    """
+    A class that serves to perform GET requests to the Melissa API and get property information
+    """
     def __init__(self, freeform_address : str):
-        self.base_url = BASE_LOOKUP_PROPERTY_URL
-        self.full_url = self._build_url(freeform_address)
+        self._base_url = BASE_LOOKUP_PROPERTY_URL
+        self._full_url = self._build_url(freeform_address)
 
-    def _build_url(self, address) -> str:
+    def _build_url(self, ff_address: str) -> str:
+        """
+        Returns a string of the full version of the base URL based on the license key and freeform address input
+        """
         parameters = {
             'id': LICENSE_KEY,
             'format' : 'json',
@@ -19,26 +25,30 @@ class MelissaAPI:
         }
 
         encoded_param = urllib.parse.urlencode(parameters)
-        url_w_param = f'{self.base_url}?{encoded_param}'
+        url_w_param = f'{self._base_url}?{encoded_param}'
         return url_w_param
     
-    def request_data(self):
+    def request_data(self) -> dict:
+        """
+        Returns a dictionary of the response retrieved from the GET request to the Melissa API
+        """
         try:
-            response = urllib.request.urlopen(self.full_url)
+            response = urllib.request.urlopen(self._full_url)
             data = response.read().decode(encoding="utf-8")
             json_data = json.loads(data)
-            # print(json_data['Records'][0]['Tax']['AssessedValueTotal'])
             return json_data
         except Exception as e:
             print(f"Error: {e}")
         finally:
             response.close()
 
-def filter_data(json_data):
+def filter_data(json_data: dict) -> dict:
     """
-    Get value in key:   'Tax' -> 'AssessedValueTotal'
+    Returns a dictionary of filtered data that filters the downloaded json data
+    Filters include:    'Tax' -> 'AssessedValueTotal'
                         'PropertyUseInfo' -> 'YearBuilt'
-                        'SaleInfo' -> 'DeedLastSalePrice', 'DeedLastSaleDate'
+                        'SaleInfo' -> 'DeedLastSalePrice'
+                        'SaleInfo' -> 'DeedLastSaleDate'
     """
     whole_data = json_data['Records'][0]
     assessed_value_total = whole_data['Tax']['AssessedValueTotal']
@@ -53,8 +63,7 @@ def filter_data(json_data):
     return filtered_dict
 
 def main():
-    # ff_address = "1030 North Princeton Avenue, Fullerton, CA, 92831"
-    ff_address = "1030 North Princeton, Fullerton, CA, 92831"
+    ff_address = "1030 North Princeton Avenue, Fullerton, CA, 92831"
     lookup_obj = MelissaAPI(ff_address)
     response_data = lookup_obj.request_data()
     filtered_data = filter_data(response_data)
