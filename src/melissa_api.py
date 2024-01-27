@@ -53,8 +53,8 @@ def filter_data(json_data: dict) -> dict:
     whole_data = json_data['Records'][0]
     assessed_value_total = whole_data['Tax']['AssessedValueTotal']
     year_built = whole_data['PropertyUseInfo']['YearBuilt']
-    last_sale_date = whole_data['SaleInfo']['DeedLastSalePrice']
-    last_sale_price = whole_data['SaleInfo']['DeedLastSaleDate']
+    last_sale_price = whole_data['SaleInfo']['DeedLastSalePrice']
+    last_sale_date = whole_data['SaleInfo']['DeedLastSaleDate']
     filtered_dict = {"assessed_total": assessed_value_total,
                         "build_year": year_built,
                         "last_sale date": last_sale_date,
