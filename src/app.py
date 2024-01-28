@@ -17,12 +17,56 @@ def get_user_info():
 
 @app.route('/api/get_leaderboard_info')
 def get_leaderboard_info():
-    # TODO: Get the top, say twenty, users based on streak param
-    pass
+    """
+    Returns a JSON object which has a list of dictionaries of all the users, else return an error message
+    """
+    def operate_on_database(json_data):
+        """
+        Operate on database by getting the executing the "get top 20" users based on streak
+        """
+        credentials_path = Path(__file__).parent.parent/ "credentials.txt"
+        user = ""
+        password = ""
+        db_name = ""
+
+        with open(credentials_path, 'r') as cred_file:
+            user = cred_file.readline().rstrip('\n')
+            password = cred_file.readline().rstrip('\n')
+            db_name = cred_file.readline().rstrip('\n')
+
+        query = database.get_top_20_query()
+        connection = connect_to_database(user, password, db_name)
+        return database.execute_query_top_20(connection, query)
+
+    if (flask.request.args.get("key") != KEY):
+        return jsonify({"message": "ERR, WRONG KEY"})
+    else:
+        data = flask.request.json
+        top_20 = operate_on_database(data)
+        list_of_dict = list()
+        for elem in top_20:
+            username = i[0]
+            profile_image = i[1]
+            correct_guesses = i[2]
+            total_guesses = i[3]
+            join_date = i[4]
+            streak = i[5]
+            list_of_dict.append({"username": username, "profile_image": profile_image,
+                                "correct_guesses": correct_guesses, "total_guesses": total_guesses,
+                                "join_date": join_date, "streak": streak})
+        return {"list": list_of_dict}
+
+        
 
 @app.route('/api/send_user_info', methods=['POST'])
 def receive_user_info():
+    """
+    Returns a json object if the database update was successful, else return a message
+    """
     def update_database(json_data):
+        """
+        Updates the database based on json data that is received from front-end request
+        """
         credentials_path = Path(__file__).parent.parent/ "credentials.txt"
         user = ""
         password = ""
@@ -35,12 +79,12 @@ def receive_user_info():
 
         #TODO: Check if the user is in the database already before updating, otherwise be sure to create the user
         
-        username = data["username"]
-        corr_guess = data["correct_guesses"]
-        total_guess = data["total_guesses"]
-        streak_num = data["streak"]
+        username = json_data["username"]
+        corr_guess = json_data["correct_guesses"]
+        total_guess = json_data["total_guesses"]
+        streak_num = json_data["streak"]
+        
         update_query, update_tuples = database.make_update_query(username, corr_guess, total_guess, streak_num)
-
         connection = database.connect_to_database(user, password, db_name)
         database.execute_query_insert_update(connection, update_query, update_tuples)
     
