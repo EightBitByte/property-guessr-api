@@ -35,6 +35,14 @@ def execute_query(conn, query):
 
         return cursor.fetchall()
 
+def make_search_query():
+    pass
+
+def make_insert_query():
+    pass
+
+# def make_update_query():
+
 if __name__ == "__main__":
     credentials_path = Path(__file__).parent.parent / "credentials.txt"
 
