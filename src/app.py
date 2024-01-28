@@ -5,6 +5,7 @@ import address
 import melissa_api
 import database
 from pathlib import Path
+from database import *
 
 KEY = "923E2A273E796"
 
@@ -82,12 +83,12 @@ def get_leaderboard_info():
         top_20 = operate_on_database(data)
         list_of_dict = list()
         for elem in top_20:
-            username = i[0]
-            profile_image = i[1]
-            correct_guesses = i[2]
-            total_guesses = i[3]
-            join_date = i[4]
-            streak = i[5]
+            username = elem[0]
+            profile_image = elem[1]
+            correct_guesses = elem[2]
+            total_guesses = elem[3]
+            join_date = elem[4]
+            streak = elem[5]
             list_of_dict.append({"username": username, "profile_image": profile_image,
                                 "correct_guesses": correct_guesses, "total_guesses": total_guesses,
                                 "join_date": join_date, "streak": streak})
