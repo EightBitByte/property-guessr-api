@@ -7,7 +7,7 @@ import melissa_api
 app = Flask(__name__)
 
 @app.route('/api/get_property_info')
-def create_json_property_info() -> JSON:
+def create_json_property_info():
     """
     Returns a JSON object of a dictionary containing the full address and property information
     """
