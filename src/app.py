@@ -13,7 +13,44 @@ app = Flask(__name__)
 @app.route('/api/get_user_info')
 def get_user_info():
     # TODO: Will contain a query parameter with username and key, do the usual key checking, return row with username
-    pass
+    def operate_on_database(json_data):
+        credentials_path = Path(__file__).parent.parent/ "credentials.txt"
+        user = ""
+        password = ""
+        db_name = ""
+
+        with open(credentials_path, 'r') as cred_file:
+            user = cred_file.readline().rstrip('\n')
+            password = cred_file.readline().rstrip('\n')
+            db_name = cred_file.readline().rstrip('\n')
+        
+        username = json_data["username"]
+
+        connection = connect_to_database(user, password, db_name)
+        query = make_search_query(username)
+        results = database.execute_query_search(connection, query, True)
+        if (len(results) == 0):
+            insert_query, insert_tuples = database.make_insert_query(username, "NULL", 0, 0, "CURRENT_TIMESTAMP")
+            print(database.execute_query_insert_update(connection, insert_query, insert_tuples))
+            results = database.execute_query_search(connection, query, True)
+        
+        username = results[0]
+        profile_image = results[1]
+        correct_guesses = results[2]
+        total_guesses = results[3]
+        join_date = results[4]
+        streak = results[5]
+        return {"username": username, "profile_image": profile_image, "correct_guesses": correct_guesses,
+                "total_guesses": total_guesses, "join_date": join_date, "streak": streak}
+
+            
+        
+    if (flask.request.args.get("key") != KEY):
+        return jsonify({"message": "ERR, WRONG KEY"})
+    else:
+        data = flask.request.json
+        return operate_on_database(data)
+    
 
 @app.route('/api/get_leaderboard_info')
 def get_leaderboard_info():
@@ -34,8 +71,8 @@ def get_leaderboard_info():
             password = cred_file.readline().rstrip('\n')
             db_name = cred_file.readline().rstrip('\n')
 
-        query = database.get_top_20_query()
         connection = connect_to_database(user, password, db_name)
+        query = database.get_top_20_query()
         return database.execute_query_top_20(connection, query)
 
     if (flask.request.args.get("key") != KEY):
@@ -77,16 +114,20 @@ def receive_user_info():
             password = cred_file.readline().rstrip('\n')
             db_name = cred_file.readline().rstrip('\n')
 
-        #TODO: Check if the user is in the database already before updating, otherwise be sure to create the user
-        
         username = json_data["username"]
         corr_guess = json_data["correct_guesses"]
         total_guess = json_data["total_guesses"]
         streak_num = json_data["streak"]
         
-        update_query, update_tuples = database.make_update_query(username, corr_guess, total_guess, streak_num)
         connection = database.connect_to_database(user, password, db_name)
-        database.execute_query_insert_update(connection, update_query, update_tuples)
+        query = make_search_query(username)
+        results = database.execute_query_search(connection, query, True)
+        if (len(results) == 0):
+            insert_query, insert_tuples = database.make_insert_query(username, "NULL", 0, 0, "CURRENT_TIMESTAMP")
+            print(database.execute_query_insert_update(connection, insert_query, insert_tuples))
+        else:
+            update_query, update_tuples = database.make_update_query(username, corr_guess, total_guess, streak_num)
+            database.execute_query_insert_update(connection, update_query, update_tuples)
     
     if (flask.request.args.get("key") != KEY):
         return jsonify({"message": "ERR, WRONG KEY"})
