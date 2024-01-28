@@ -3,6 +3,8 @@ from flask import jsonify
 import flask
 import address
 import melissa_api
+import database
+from pathlib import Path
 
 KEY = "key goes here"
 
@@ -10,14 +12,32 @@ app = Flask(__name__)
 
 @app.route('/api/send_user_info', methods=['POST'])
 def receive_user_info():
+    def update_database(json_data):
+        credentials_path = Path(__file__).parent.parent/ "credentials.txt"
+        user = ""
+        password = ""
+        db_name = ""
+
+        with open(credentials_path, 'r') as cred_file:
+            user = cred_file.readline().rstrip('\n')
+            password = cred_file.readline().rstrip('\n')
+            db_name = cred_file.readline().rstrip('\n')
+        
+        username = data["username"]
+        corr_guess = data["correct_guesses"]
+        total_guess = data["total_guesses"]
+        streak_num = data["streak"]
+        update_query, update_tuples = database.make_update_query(username, corr_guess, total_guess, streak_num)
+
+        connection = database.connect_to_database(user, password, db_name)
+        execute_query_insert_update(connection, update_query, update_tuples)
+    
     if (flask.request.args.get("key") != KEY):
         return jsonify({"message": "ERR, WRONG KEY"})
-
-    data = flask.request.json
-
-    # Do something with the data 
-
-    return {"message": "Data received"}
+    else:
+        data = flask.request.json
+        update_database(data)
+        return {"message": "Data received"}
 
 
 @app.route('/api/get_property_info')
