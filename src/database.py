@@ -45,7 +45,10 @@ def make_search_query(name : str):
     """
     Returns a string for a search query using a certain username
     """
-    return f'SELECT * FROM users WHERE username = "{name}";'
+    if name == "":
+        return f'SELECT * FROM users;'
+    else:
+        return f'SELECT * FROM users WHERE username = "{name}";'
 
 def make_insert_query(username: str, profile_image: str,
                         correct_guesses: str, total_guesses: str, 
@@ -53,11 +56,15 @@ def make_insert_query(username: str, profile_image: str,
     """
     Returns a tuple of a string for an insert query and the inputs to be inserted to the database
     """
-    base_query = "INSERT INTO users(username, profile_image, correct_guesses, total_guesses, join_date) VALUES(%s, %s, %s, %s, %s);"
-    values_tuple = (username, profile_image, correct_guesses, total_guesses, join_data)
+    base_query = "INSERT INTO users(username, profile_image, correct_guesses, total_guesses, join_date, streak) VALUES(%s, %s, %s, %s, %s, %s);"
+    values_tuple = (username, profile_image, correct_guesses, total_guesses, join_data, '0')
     return base_query, values_tuple
 
-# def make_update_query():
+def make_update_query():
+    """
+    Returns a
+    """
+    
 
 if __name__ == "__main__":
     credentials_path = Path(__file__).parent.parent / "credentials.txt"
@@ -71,11 +78,11 @@ if __name__ == "__main__":
         password = cred_file.readline().rstrip('\n')
         db_name = cred_file.readline().rstrip('\n')
 
-    # query = make_search_query("jmoyai")
-    query, tuples = make_insert_query('ptum', 'NULL', '20', '21', '2024-01-27 00:00:00')
+    query = make_search_query("")
+    # query, tuples = make_insert_query('lmao', 'NULL', '20', '21', 'CURRENT_TIMESTAMP')
 
     connection = connect_to_database(user, password, db_name)
-    # result = execute_query_search(connection, query)
-    result = execute_query_insert(connection, query, tuples)
+    result = execute_query_search(connection, query)
+    # result = execute_query_insert(connection, query, tuples)
 
     print(result)
