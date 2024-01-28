@@ -4,7 +4,21 @@ import flask
 import address
 import melissa_api
 
+KEY = "key goes here"
+
 app = Flask(__name__)
+
+@app.route('/api/send_user_info', methods=['POST'])
+def receive_user_info():
+    if (flask.request.args.get("key") != KEY):
+        return jsonify({"message": "ERR, WRONG KEY"})
+
+    data = flask.request.json
+
+    # Do something with the data 
+
+    return {"message": "Data received"}
+
 
 @app.route('/api/get_property_info')
 def create_json_property_info():
@@ -32,7 +46,7 @@ def create_json_property_info():
         return filtered_data
 
     if flask.request.args.get("key") != "923E2A273E796":
-        return jsonify({"message": "ERR, WRONG KEY"})
+        return jsonify({"message": "Wrong key"})
     else:
         while True:
             try:
