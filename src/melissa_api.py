@@ -51,14 +51,17 @@ def filter_data(json_data: dict) -> dict:
                         'SaleInfo' -> 'DeedLastSaleDate'
     """
     def format_prices(price: str) -> str:
-        '''formats prices so it will have commas, and a dollar sign in front of it'''
-        price = float(price)
+        """
+        Returns and formats prices so it will have commas, and a dollar sign in front of it
+        """
+        price = int(price)
         formatted_price = "$" + "{:,.0f}".format(price)
         return formatted_price
 
     def format_dates(date: str) -> str:
-        """ formats the date in a striing format"""
-        ans = date[4:6] + "/" + date[6:8] + "/" + date[0:4] #20111028
+        """ 
+        Returns a string of a formatted date """
+        ans = date[4:6] + "/" + date[6:8] + "/" + date[0:4]
         return ans
 
 
@@ -67,10 +70,14 @@ def filter_data(json_data: dict) -> dict:
     year_built = whole_data['PropertyUseInfo']['YearBuilt']
     last_sale_price = whole_data['SaleInfo']['DeedLastSalePrice']
     last_sale_date = whole_data['SaleInfo']['DeedLastSaleDate']
-    filtered_dict = {"assessed_total": format_prices(assessed_value_total), #str
+    filtered_dict = {
+                        "assessed_total_formatted": format_prices(assessed_value_total),
+                        "assessed_total": assessed_value_total,
                         "build_year": year_built,
-                        "last_sale_date": format_dates(last_sale_date), # 12/12/12 str 01/01/21  20210101
-                        "last_sale_price": format_prices(last_sale_price) #str 
+                        "last_sale_date_formatted": format_dates(last_sale_date),
+                        "last_sale_date": last_sale_date,
+                        "last_sale_price_formatted": format_prices(last_sale_price),
+                        "last_sale_price": last_sale_price
                     }
     
     
