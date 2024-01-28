@@ -1,8 +1,8 @@
 from flask import Flask
 from flask import jsonify
+import flask
 import address
 import melissa_api
-
 
 app = Flask(__name__)
 
@@ -31,10 +31,17 @@ def create_json_property_info():
         filtered_data = melissa_api.filter_data(response_data)
         return filtered_data
 
-    full_address_dict = generate_address()
-    property_info_dict = generate_property_info(full_address_dict['address'])
-    merged_dicts = full_address_dict | property_info_dict
-    return jsonify(merged_dicts)
+    if flask.request.args.get("key") != "923E2A273E796":
+        return jsonify({"message": "ERR, WRONG KEY"})
+    else:
+        while True:
+            try:
+                full_address_dict = generate_address()
+                property_info_dict = generate_property_info(full_address_dict['address'])
+                merged_dicts = full_address_dict | property_info_dict
+                return jsonify(merged_dicts)
+            except Exception:
+                pass
 
     
 if __name__ == '__main__':
