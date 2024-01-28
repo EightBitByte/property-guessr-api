@@ -4,8 +4,6 @@ import flask
 import address
 import melissa_api
 
-KEY = "923E2A273E796"
-
 app = Flask(__name__)
 
 @app.route('/api/get_property_info')
