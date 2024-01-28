@@ -40,6 +40,14 @@ def execute_query_insert(conn, query:str, values:tuple):
         cursor.execute(query, values)
         conn.commit()
         return 1
+    
+def execute_query_top_20(conn, query:str):
+    with conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+        return results
 
 def make_search_query(name : str):
     """
@@ -64,7 +72,9 @@ def make_update_query():
     """
     Returns a
     """
-    
+
+def get_top_20_query() -> str:
+    return f'SELECT * FROM users ORDER BY streak DESC LIMIT 20'
 
 if __name__ == "__main__":
     credentials_path = Path(__file__).parent.parent / "credentials.txt"
@@ -78,11 +88,14 @@ if __name__ == "__main__":
         password = cred_file.readline().rstrip('\n')
         db_name = cred_file.readline().rstrip('\n')
 
-    query = make_search_query("")
+    # query = make_search_query("")
     # query, tuples = make_insert_query('lmao', 'NULL', '20', '21', 'CURRENT_TIMESTAMP')
+    query = get_top_20_query()
 
     connection = connect_to_database(user, password, db_name)
-    result = execute_query_search(connection, query)
+
+    # result = execute_query_search(connection, query)
     # result = execute_query_insert(connection, query, tuples)
+    result = execute_query_top_20(connection, query)
 
     print(result)
