@@ -6,9 +6,19 @@ import melissa_api
 import database
 from pathlib import Path
 
-KEY = "key goes here"
+KEY = "923E2A273E796"
 
 app = Flask(__name__)
+
+@app.route('/api/get_user_info')
+def get_user_info():
+    # TODO: Will contain a query parameter with username and key, do the usual key checking, return row with username
+    pass
+
+@app.route('/api/get_leaderboard_info')
+def get_leaderboard_info():
+    # TODO: Get the top, say twenty, users based on streak param
+    pass
 
 @app.route('/api/send_user_info', methods=['POST'])
 def receive_user_info():
@@ -22,6 +32,8 @@ def receive_user_info():
             user = cred_file.readline().rstrip('\n')
             password = cred_file.readline().rstrip('\n')
             db_name = cred_file.readline().rstrip('\n')
+
+        #TODO: Check if the user is in the database already before updating, otherwise be sure to create the user
         
         username = data["username"]
         corr_guess = data["correct_guesses"]
@@ -30,7 +42,7 @@ def receive_user_info():
         update_query, update_tuples = database.make_update_query(username, corr_guess, total_guess, streak_num)
 
         connection = database.connect_to_database(user, password, db_name)
-        execute_query_insert_update(connection, update_query, update_tuples)
+        database.execute_query_insert_update(connection, update_query, update_tuples)
     
     if (flask.request.args.get("key") != KEY):
         return jsonify({"message": "ERR, WRONG KEY"})
