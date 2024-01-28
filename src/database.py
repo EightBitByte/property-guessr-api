@@ -20,23 +20,30 @@ def connect_to_database(db_username: str, db_password: str, db_name: str):
     """
     Connect to the database at DB_ENDPOINT with username and password provided, returning the connection object. 
     """
-    conn = pymysql.connect(host=DB_ENDPOINT, user=db_username, password=db_password)
+    conn = pymysql.connect(host=DB_ENDPOINT, user=db_username, password=db_password, database="guessr_db")
     return conn
 
-def execute_query(conn, query):
+def execute_query(conn, query:str):
     """
     Executes the MySQL query against the targetted connection.
     """
     with conn:
-        with conn.cursor() as cursor:
-            cursor.execute(query)
-    
-        conn.commit()
+        cursor = conn.cursor()
+        cursor.execute(query)
 
-        return cursor.fetchall()
+        if query.startswith("INSERT"):
+            conn.commit()
+            return 1
+        elif query.startswith("SELECT"):
+            print(cursor.fetchall())
+            return cursor.fetchall()
+        
+        cursor.close()
+        
 
-def make_search_query():
-    pass
+def make_search_query(name : str):
+    '''searches for a certain username and return the whole row'''
+    return f'SELECT * FROM users WHERE username = "{name}";'
 
 def make_insert_query():
     pass
@@ -55,9 +62,7 @@ if __name__ == "__main__":
         password = cred_file.readline().rstrip('\n')
         db_name = cred_file.readline().rstrip('\n')
 
-    query = """
-    QUERY GOES HERE
-    """
+    query = make_search_query("jmoyai")
 
     connection = connect_to_database(user, password, db_name)
     result = execute_query(connection, query)
