@@ -1,4 +1,4 @@
-from src import app
+from src.app import *
 
 def lambda_handler(event, context):
     return {

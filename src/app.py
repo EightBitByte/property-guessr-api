@@ -1,11 +1,10 @@
 from flask import Flask
 from flask import jsonify
 import flask
-import address
-import melissa_api
-import database
+from .address import *
+from .melissa_api import *
+from .database import *
 from pathlib import Path
-from database import *
 
 KEY = "923E2A273E796"
 
@@ -29,11 +28,11 @@ def get_user_info():
 
         connection = connect_to_database(user, password, db_name)
         query = make_search_query(username)
-        results = database.execute_query_search(connection, query, True)
+        results = execute_query_search(connection, query, True)
         if (len(results) == 0):
-            insert_query, insert_tuples = database.make_insert_query(username, "NULL", 0, 0, "CURRENT_TIMESTAMP")
-            print(database.execute_query_insert_update(connection, insert_query, insert_tuples))
-            results = database.execute_query_search(connection, query, True)
+            insert_query, insert_tuples = make_insert_query(username, "NULL", 0, 0, "CURRENT_TIMESTAMP")
+            print(execute_query_insert_update(connection, insert_query, insert_tuples))
+            results = execute_query_search(connection, query, True)
         
         username = results[0]
         profile_image = results[1]
@@ -73,8 +72,8 @@ def get_leaderboard_info():
             db_name = cred_file.readline().rstrip('\n')
 
         connection = connect_to_database(user, password, db_name)
-        query = database.get_top_20_query()
-        return database.execute_query_top_20(connection, query)
+        query = get_top_20_query()
+        return execute_query_top_20(connection, query)
 
     if (flask.request.args.get("key") != KEY):
         return jsonify({"message": "ERR, WRONG KEY"})
@@ -120,15 +119,15 @@ def receive_user_info():
         total_guess = json_data["total_guesses"]
         streak_num = json_data["streak"]
         
-        connection = database.connect_to_database(user, password, db_name)
+        connection = connect_to_database(user, password, db_name)
         query = make_search_query(username)
-        results = database.execute_query_search(connection, query, True)
+        results = execute_query_search(connection, query, True)
         if (len(results) == 0):
-            insert_query, insert_tuples = database.make_insert_query(username, "NULL", 0, 0, "CURRENT_TIMESTAMP")
-            print(database.execute_query_insert_update(connection, insert_query, insert_tuples))
+            insert_query, insert_tuples = make_insert_query(username, "NULL", 0, 0, "CURRENT_TIMESTAMP")
+            print(execute_query_insert_update(connection, insert_query, insert_tuples))
         else:
-            update_query, update_tuples = database.make_update_query(username, corr_guess, total_guess, streak_num)
-            database.execute_query_insert_update(connection, update_query, update_tuples)
+            update_query, update_tuples = make_update_query(username, corr_guess, total_guess, streak_num)
+            execute_query_insert_update(connection, update_query, update_tuples)
     
     if (flask.request.args.get("key") != KEY):
         return jsonify({"message": "ERR, WRONG KEY"})
@@ -147,7 +146,7 @@ def create_json_property_info():
         """
         Returns a dictionary of a random address {address, latitude, longitude}
         """
-        random_address = address.RandomAddress()
+        random_address = RandomAddress()
         ff_address = random_address.format_address()
         lat_long = random_address.generate_coord()
         return {"address": ff_address, 
@@ -158,9 +157,9 @@ def create_json_property_info():
         """
         Returns a dictionary of the property information
         """
-        lookup_obj = melissa_api.MelissaAPI(ff_address)
+        lookup_obj = MelissaAPI(ff_address)
         response_data = lookup_obj.request_data()
-        filtered_data = melissa_api.filter_data(response_data)
+        filtered_data = filter_data(response_data)
         return filtered_data
 
     if flask.request.args.get("key") != "923E2A273E796":
