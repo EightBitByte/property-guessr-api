@@ -36,10 +36,14 @@ def create_json_property_info():
     if flask.request.args.get("key") != "923E2A273E796":
         return jsonify({"message": "ERR, WRONG KEY"})
     else:
-        full_address_dict = generate_address()
-        property_info_dict = generate_property_info(full_address_dict['address'])
-        merged_dicts = full_address_dict | property_info_dict
-        return jsonify(merged_dicts)
+        while True:
+            try:
+                full_address_dict = generate_address()
+                property_info_dict = generate_property_info(full_address_dict['address'])
+                merged_dicts = full_address_dict | property_info_dict
+                return jsonify(merged_dicts)
+            except Exception:
+                pass
 
     
 if __name__ == '__main__':
