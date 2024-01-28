@@ -23,14 +23,17 @@ def connect_to_database(db_username: str, db_password: str, db_name: str):
     conn = pymysql.connect(host=DB_ENDPOINT, user=db_username, password=db_password, database="guessr_db")
     return conn
 
-def execute_query_search(conn, query:str):
+def execute_query_search(conn, query:str, isFetchOne:bool):
     """
     Executes the MySQL search query against the targetted connection.
     """
     with conn:
         cursor = conn.cursor()
         cursor.execute(query)
-        results = cursor.fetchall()
+        if isFetchOne:
+            results = cursor.fetchone()
+        else:
+            results = cursor.fetchall()
         cursor.close()
         return results
         
@@ -50,7 +53,7 @@ def execute_query_top_20(conn, query:str):
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
-        return results
+        return list(results)
 
 def make_search_query(name : str):
     """
@@ -94,15 +97,15 @@ if __name__ == "__main__":
         password = cred_file.readline().rstrip('\n')
         db_name = cred_file.readline().rstrip('\n')
 
-    # query = make_search_query("")
+    query = make_search_query("")
     # query, tuples = make_insert_query('lmao', 'NULL', '20', '21', 'CURRENT_TIMESTAMP')
     # query, tuples = make_update_query('jmoyai', 12, 34, 5)
     # query = get_top_20_query()
 
     connection = connect_to_database(user, password, db_name)
 
-    # result = execute_query_search(connection, query)
+    result = execute_query_search(connection, query, False)
     # result = execute_query_insert_update(connection, query, tuples)
-    result = execute_query_top_20(connection, query)
+    # result = execute_query_top_20(connection, query)
 
     print(result)
