@@ -17,6 +17,10 @@ app = Flask(__name__)
 def home():
     return "ooga booga"
 
+@app.rout('/erm')
+def erm():
+    return 'well this is awkward'
+
 """
 @app.route('/get_user_info')
 def get_user_info():
