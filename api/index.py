@@ -1,4 +1,5 @@
 from flask import Flask
+"""
 from flask import jsonify
 import flask
 import address
@@ -6,6 +7,7 @@ import melissa_api
 import database
 from pathlib import Path
 from database import *
+"""
 
 KEY = "923E2A273E796"
 
