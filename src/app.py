@@ -11,6 +11,11 @@ KEY = "923E2A273E796"
 
 app = Flask(__name__)
 
+@app.route('/')
+def home():
+    return "ooga booga";
+
+@app.route('/get_user_info')
 def get_user_info():
     def operate_on_database(json_data):
         credentials_path = Path(__file__).parent.parent/ "credentials.txt"
@@ -50,6 +55,7 @@ def get_user_info():
         data = flask.request.json
         return operate_on_database(data)
 
+@app.route('/get_leaderboard_info')
 def get_leaderboard_info():
     """
     Returns a JSON object which has a list of dictionaries of all the users, else return an error message
@@ -90,6 +96,7 @@ def get_leaderboard_info():
                                 "join_date": join_date, "streak": streak})
         return {"list": list_of_dict}
 
+@app.route('/receive_user_info')
 def receive_user_info():
     """
     Returns a json object if the database update was successful, else return a message
@@ -130,6 +137,7 @@ def receive_user_info():
         update_database(data)
         return {"message": "Data received"}
 
+@app.route('/get_property_info')
 def get_property_info():
     """
     Returns a JSON object of a dictionary containing the full address and property information
@@ -166,7 +174,6 @@ def get_property_info():
             except Exception:
                 pass
 
-@app.route('/')
 def call_apis():
     if (flask.request.args.get("req") == "get_user_info"):
         return get_user_info()
@@ -177,6 +184,3 @@ def call_apis():
     elif (flask.request.args.get("req") == "get_property_info"):
         return get_property_info()
     return jsonify({"message": "Err"})
-
-if __name__ == '__main__':
-    app.run(debug=True)
